@@ -42,7 +42,7 @@ An advisory in [`advisories.ignore`](cfg.md#ignore) was encountered.
 
 ### `advisory-ignore-expired`
 
-An advisory in [`advisories.ignore`](cfg.md#ignore) was published over the limit specified in either the ignore's [`expiry`](cfg.md#expiry) or the default [`ignore-expiry`](cfg.md#ignore-expiry).
+An advisory in [`advisories.ignore`](cfg.md#ignore) has expired according to the ignore's [`expiry`](cfg.md#expiry) or the default [`ignore-expiry`](cfg.md#ignore-expiry).
 
 ### `advisory-ignore-disallowed-dependent`
 
@@ -51,6 +51,10 @@ A direct dependent of a crate that an advisory applied to was not present in the
 ### `advisory-ignore-allowed-dependent-missing`
 
 A [PackageSpec](../cfg.md#package-specs) in the [`ignore.allow`](cfg.md#allow) list was not a direct dependent of any crate that the advisory applies to.
+
+### `advisory-withdrawn`
+
+An advisory in [`advisories.ignore`](cfg.md#ignore) has been withdrawn and will no longer emit a diagnostic if it is not ignored, meaning it can safely be removed from [`advisories.ignore`](cfg.md#ignore).
 
 ### `unknown-advisory`
 

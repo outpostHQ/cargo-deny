@@ -9,7 +9,7 @@ Contains all of the configuration for `cargo deny check advisories`
 db-urls = ["https://github.com/RustSec/advisory-db"]
 db-path = "~/.cargo/advisory-dbs" # Or wherever $CARGO_HOME/advisory-dbs resolves to
 yanked = "warn"
-unmaintained = "all"
+unmaintained = "workspace"
 unsound = "workspace"
 maximum-db-staleness = "P90D" # Only checked when advisory database fetching has been disabled
 unused-ignored-advisory = "warn"
@@ -81,6 +81,7 @@ Controls whether the local registry indices are checked for yanked crates (see [
 ignore = [
    "RUSTSEC-0000-0000",
    { id = "RUSTSEC-0000-0000", reason = "this vulnerability does not affect us as we don't use the particular code path" },
+   { id = "RUSTSEC-0000-0001", reason = "waiting on an upstream fix", expiry = "2026-12-31" },
    "yanked@0.1.1",
    { crate = "yanked-crate@0.1.1", reason = "a semver compatible version hasn't been published yet" },
 ]
@@ -100,7 +101,12 @@ ignore = [
 ]
 ```
 
-Allows an advisory to be ignored until the specified [duration](#durations) has elapsed since the the advisory was published. If there is no expiry for the individual ignore then [`ignore-expiry`](#ignore-expiry) is used if it is present.
+Allows an advisory to be ignored only until an expiry is reached, after which the advisory is reported as normal and an `advisory-ignore-expired` diagnostic pointing at the `expiry` value is emitted
+
+- A [duration](#durations) which is relative to when the publish date of the advisory.
+- An absolute date in ISO-8601 form, ie. `YYYY-MM-DD`.
+
+If there is no expiry for the individual ignore then [`ignore-expiry`](#ignore-expiry) is used if it is present.
 
 #### `allow`
 
@@ -116,9 +122,11 @@ A list of [PackageSpecs](../cfg.md#package-specs) of the crates that are allowed
 
 ```toml
 ignore-expiry = "P90D"
+# or an absolute date
+# ignore-expiry = "2026-12-31"
 ```
 
-The default [duration](#durations) used if an [`expiry`](#expiry) is not present for a specific advisory.
+The default expiry used if an [`expiry`](#expiry) is not present for a specific advisory.
 
 ### `unmaintained`
 
@@ -128,8 +136,8 @@ unmaintained = 'workspace'
 
 Determines if unmaintained advisories will result in an error. An unmaintained error can still be ignored specifically via the [`ignore`](#ignore) option.
 
-- `all` (default) - Any crate that matches an unmaintained advisory will fail
-- `workspace` - Unmaintained advisories will only fail if they apply to a crate which is a direct dependency of one or more workspace crates.
+- `all` - Any crate that matches an unmaintained advisory will fail
+- `workspace` (default) - Unmaintained advisories will only fail if they apply to a crate which is a direct dependency of one or more workspace crates.
 - `transitive` - Unmaintained advisories will only fail if they apply to a crate which is **not** a direct dependency of one or more workspace crates.
 - `none` - Unmaintained advisories are completely ignored.
 
